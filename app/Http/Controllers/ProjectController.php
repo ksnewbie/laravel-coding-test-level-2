@@ -45,6 +45,11 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        request()->validate(
+            [
+                'name' => 'required',
+            ]
+        );
         $createProject = $this->projectService->createNewProject($request);
 
         return response()->json([$createProject]);
@@ -83,6 +88,12 @@ class ProjectController extends Controller
      */
     public function update(Request $request, $id)
     {
+        request()->validate(
+            [
+                'name' => 'required',
+            ]
+        );
+
         $updateProject = $this->projectService->updateProject($request, $id);
 
         return response()->json(['messages' => $updateProject]);
@@ -99,5 +110,12 @@ class ProjectController extends Controller
         $deleteProject = $this->projectService->deleteProject($id);
 
         return response()->json(['messages' => $deleteProject]);
+    }
+
+    public function add(Request $request)
+    {
+        $addMember = $this->projectService->addMember($request);
+
+        return response()->json(['messages' => $addMember]);
     }
 }

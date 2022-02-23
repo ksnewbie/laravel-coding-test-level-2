@@ -16,9 +16,10 @@ class UserSeeder extends Seeder
     {
         // Seed a default user
         $data = [
-            'name' => 'Default User',
-            'username' => 'user1',
+            'name' => 'Default Admin',
+            'username' => 'admin',
             'password' => bcrypt('Secret123#'),
+            'role' => 'admin'
         ];
 
         User::updateOrCreate(['email' => 'test@test.com'], $data);

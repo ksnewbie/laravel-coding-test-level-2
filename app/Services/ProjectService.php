@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Project;
+use App\Models\User;
+use App\Models\ProjectMember;
 
 class ProjectService
 {
@@ -28,6 +30,7 @@ class ProjectService
     {
         $data = [
             'name' => $request->name,
+            'user_id' => $request->user()->id
         ];
 
         $createProject = Project::create($data);
@@ -59,5 +62,25 @@ class ProjectService
         $project->delete($id);
 
         return 'Successfully deleted project.';
+    }
+
+    public function addMember($request)
+    {
+        $project = Project::find($request->project_id);
+        if (!$project) {
+            return 'Project not found';
+        }
+        $user = User::find($request->user_id);
+        if (!$user) {
+            return 'User not found';
+        }
+        $existMember = ProjectMember::where('project_id', $request->project_id)->where('user_id', $request->user_id)->first();
+        
+        if ($existMember) {
+            return 'User already added to the project.';
+        }
+        ProjectMember::create($request->all());
+
+        return 'Successfully added member to project.';
     }
 }

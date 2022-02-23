@@ -30,7 +30,8 @@ class UserService
             'name' => $request->name,
             'username' => $request->username,
             'password' => bcrypt($request->password),
-            'email' => $request->email
+            'email' => $request->email,
+            'role' => $request->role
         ];
 
         $createUser = User::create($data);
@@ -40,12 +41,14 @@ class UserService
 
     public function updateUser($request, $id)
     {
+        $user = User::find($id);
+
         $data = [
             'name' => $request->name,
             'password' => bcrypt($request->password),
+            'role' => $request->role ? $request->role : $user->role
         ];
-        
-        $user = User::find($id);
+
         if (!$user) {
             return 'User not found';
         }
@@ -54,13 +57,17 @@ class UserService
         return 'Successfully update user ';
     }
 
-    public function deleteUser($id)
+    public function deleteUser($user, $id)
     {
-        $user = User::find($id);
-        if (!$user) {
+        $deleteUser = User::find($id);
+        if (!$deleteUser) {
             return 'User not found';
         }
-        $user->delete($id);
+
+        if ($user->id == $deleteUser->id) {
+            return 'Users are not allow to delete himself/herself.';
+        }
+        $deleteUser->delete($id);
 
         return 'Successfully deleted user.';
     }

@@ -23,7 +23,21 @@ class LoginController extends Controller
 
         $user = auth()->user();
 
-        $accessToken = $user->createToken('authToken');
+        if ($user->role == 'admin') {
+            $data = [
+                'manage-users',
+            ];
+        } elseif ($user->role == 'product_owner') {
+            $data = [
+                'manage-projects',
+                'manage-tasks'
+            ];
+        } else {
+            $data = [
+                'manage-tasks',
+            ];
+        }
+        $accessToken = $user->createToken('authToken', $data);
 
         $data = [
             'user' => $user,

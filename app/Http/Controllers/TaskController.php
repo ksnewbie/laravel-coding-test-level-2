@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\TaskService;
+use App\Models\Task;
 
 class TaskController extends Controller
 {
@@ -44,6 +45,15 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+        request()->validate(
+            [
+                'title' => 'required',
+                'status' => 'required',
+                'project_id' => 'required',
+                'user_id' => 'required'
+            ]
+        );
+
         $createTask = $this->taskService->createNewTask($request);
 
         return response()->json([$createTask]);
@@ -82,6 +92,13 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
+        request()->validate(
+            [
+                'title' => 'required',
+                'status' => 'required|in:' . TASK::STATUS_NOT_STARTED . ',' . TASK::STATUS_IN_PROGRESS . ',' . TASK::STATUS_READY_FOR_TEST . ',' . TASK::STATUS_COMPLETED . ',',
+            ]
+        );
+
         $updateTask = $this->taskService->updateTask($request, $id);
 
         return response()->json(['messages' => $updateTask]);
@@ -98,5 +115,12 @@ class TaskController extends Controller
         $deleteTask = $this->taskService->deleteTask($id);
 
         return response()->json(['messages' => $deleteTask]);
+    }
+
+    public function assign(Request $request)
+    {
+        $assignTask = $this->taskService->assignTask($request);
+
+        return response()->json(['messages' => $assignTask]);
     }
 }
