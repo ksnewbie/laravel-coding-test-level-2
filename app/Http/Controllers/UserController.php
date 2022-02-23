@@ -44,6 +44,16 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        request()->validate(
+            [
+                'name' => 'required',
+                'username' => 'required',
+                'password' => 'required',
+                'email' => 'email|required',
+                'role' => 'required|in:admin,product_owner,member'
+            ]
+        );
+
         $createUser = $this->userService->createNewUser($request);
 
         return response()->json([$createUser]);
@@ -82,6 +92,13 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        request()->validate(
+            [
+                'name' => 'required',
+                'password' => 'required',
+            ]
+        );
+
         $updateUser = $this->userService->updateUser($request, $id);
 
         return response()->json(['messages' => $updateUser]);
@@ -95,7 +112,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $deleteUser = $this->userService->deleteUser($id);
+        $user = auth()->user();
+        $deleteUser = $this->userService->deleteUser($user, $id);
 
         return response()->json(['messages' => $deleteUser]);
     }

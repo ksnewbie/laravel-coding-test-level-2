@@ -26,14 +26,10 @@ Route::group(
     ['prefix' => 'v1'],
     function () {
         Route::post('/login', [LoginController::class, 'login']);
-        Route::group(
-            ['middleware' => 'auth:sanctum'],
-            function () {
-                Route::resource('users', UserController::class);
-                Route::resource('projects', ProjectController::class);
-                Route::resource('tasks', TaskController::class);
-            }
-        );
+        Route::resource('users', UserController::class)->middleware(['auth:sanctum', 'abilities:manage-users']);
+        Route::resource('projects', ProjectController::class)->middleware(['auth:sanctum', 'abilities:manage-projects,manage-tasks']);
+        Route::post('projects/add-member', [ProjectController::class, 'add'])->middleware(['auth:sanctum', 'abilities:manage-projects'])->name('projects.add-member');
+        Route::resource('tasks', TaskController::class)->middleware(['auth:sanctum', 'abilities:manage-tasks']);
+        Route::post('tasks/assign-task', [TaskController::class, 'assign'])->middleware(['auth:sanctum', 'abilities:manage-projects'])->name('tasks.assign');
     }
 );
-

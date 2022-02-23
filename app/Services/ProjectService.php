@@ -3,14 +3,31 @@
 namespace App\Services;
 
 use App\Models\Project;
+use App\Models\User;
+use App\Models\ProjectMember;
 
 class ProjectService
 {
-    public function getProjects()
+    public function getProjects($request)
     {
-        $users = Project::get();
-    
-        return $users;
+        $keywords = $request->q;
+        $perPage = $request->pageSize ?? 3;
+        $pageIndex = $request->pageIndex ?? 0;
+        $sortBy = $request->sortBy ?? 'name';
+        $sortDirection = $request->sortDirection ?? 'ASC';
+
+        $projectBuilder = Project::when($keywords, function ($query) use ($keywords){
+                   $query->where('name', $keywords)->get();
+                });
+
+        if ($sortDirection == 'ASC') {
+            $projectBuilder->orderBy($sortBy);
+        } else {
+            $projectBuilder->orderByDesc($sortBy);
+        }
+
+        $projects = $projectBuilder->paginate($perPage, ['*'], 'page', $pageIndex);
+        return $projects;
     }
 
     public function getProjectById($id)
@@ -28,9 +45,15 @@ class ProjectService
     {
         $data = [
             'name' => $request->name,
+            'user_id' => $request->user()->id
         ];
 
-        $createProject = Project::create($data);
+        try {
+            $createProject = Project::create($data);
+        } catch (\Exception $e) {
+            \Log::error('Error create project' . $e);
+            return ['message' => 'Error creating project. Please try again later.'];
+        }
         
         return $createProject;
     }
@@ -59,5 +82,25 @@ class ProjectService
         $project->delete($id);
 
         return 'Successfully deleted project.';
+    }
+
+    public function addMember($request)
+    {
+        $project = Project::find($request->project_id);
+        if (!$project) {
+            return 'Project not found';
+        }
+        $user = User::find($request->user_id);
+        if (!$user) {
+            return 'User not found';
+        }
+        $existMember = ProjectMember::where('project_id', $request->project_id)->where('user_id', $request->user_id)->first();
+        
+        if ($existMember) {
+            return 'User already added to the project.';
+        }
+        ProjectMember::create($request->all());
+
+        return 'Successfully added member to project.';
     }
 }
