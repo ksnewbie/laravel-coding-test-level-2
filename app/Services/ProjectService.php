@@ -48,7 +48,12 @@ class ProjectService
             'user_id' => $request->user()->id
         ];
 
-        $createProject = Project::create($data);
+        try {
+            $createProject = Project::create($data);
+        } catch (\Exception $e) {
+            \Log::error('Error create project' . $e);
+            return ['message' => 'Error creating project. Please try again later.'];
+        }
         
         return $createProject;
     }

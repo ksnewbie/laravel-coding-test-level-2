@@ -34,7 +34,12 @@ class UserService
             'role' => $request->role
         ];
 
-        $createUser = User::create($data);
+        try {
+            $createUser = User::create($data);
+        } catch (\Exception $e) {
+            \Log::error('Error create user' . $e);
+            return ['message' => 'Error creating user. Please try again later.'];
+        }
         
         return $createUser;
     }
