@@ -8,11 +8,26 @@ use App\Models\ProjectMember;
 
 class ProjectService
 {
-    public function getProjects()
+    public function getProjects($request)
     {
-        $users = Project::get();
-    
-        return $users;
+        $keywords = $request->q;
+        $perPage = $request->pageSize ?? 3;
+        $pageIndex = $request->pageIndex ?? 0;
+        $sortBy = $request->sortBy ?? 'name';
+        $sortDirection = $request->sortDirection ?? 'ASC';
+
+        $projectBuilder = Project::when($keywords, function ($query) use ($keywords){
+                   $query->where('name', $keywords)->get();
+                });
+
+        if ($sortDirection == 'ASC') {
+            $projectBuilder->orderBy($sortBy);
+        } else {
+            $projectBuilder->orderByDesc($sortBy);
+        }
+
+        $projects = $projectBuilder->paginate($perPage, ['*'], 'page', $pageIndex);
+        return $projects;
     }
 
     public function getProjectById($id)
