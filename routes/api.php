@@ -28,8 +28,8 @@ Route::group(
         Route::post('/login', [LoginController::class, 'login']);
         Route::resource('users', UserController::class)->middleware(['auth:sanctum', 'abilities:manage-users']);
         Route::resource('projects', ProjectController::class)->middleware(['auth:sanctum', 'abilities:manage-projects,manage-tasks']);
-        Route::post('projects/add-member', [ProjectController::class, 'add'])->middleware(['auth:sanctum', 'abilities:manage-projects']);
+        Route::post('projects/add-member', [ProjectController::class, 'add'])->middleware(['auth:sanctum', 'abilities:manage-projects'])->name('projects.add-member');
         Route::resource('tasks', TaskController::class)->middleware(['auth:sanctum', 'abilities:manage-tasks']);
-        Route::post('tasks/assign-task', [TaskController::class, 'assign'])->middleware(['auth:sanctum', 'abilities:manage-projects']);
+        Route::post('tasks/assign-task', [TaskController::class, 'assign'])->middleware(['auth:sanctum', 'abilities:manage-projects'])->name('tasks.assign');
     }
 );

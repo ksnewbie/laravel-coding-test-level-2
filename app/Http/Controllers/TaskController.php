@@ -48,7 +48,6 @@ class TaskController extends Controller
         request()->validate(
             [
                 'title' => 'required',
-                'status' => 'required',
                 'project_id' => 'required',
                 'user_id' => 'required'
             ]
@@ -94,8 +93,7 @@ class TaskController extends Controller
     {
         request()->validate(
             [
-                'title' => 'required',
-                'status' => 'required|in:' . TASK::STATUS_NOT_STARTED . ',' . TASK::STATUS_IN_PROGRESS . ',' . TASK::STATUS_READY_FOR_TEST . ',' . TASK::STATUS_COMPLETED . ',',
+                'status' => 'in:' . TASK::STATUS_NOT_STARTED . ',' . TASK::STATUS_IN_PROGRESS . ',' . TASK::STATUS_READY_FOR_TEST . ',' . TASK::STATUS_COMPLETED . ',',
             ]
         );
 

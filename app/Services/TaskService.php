@@ -58,8 +58,8 @@ class TaskService
         }
 
         $data = [
-            'title' => $request->title,
-            'description' => $request->description,
+            'title' => $request->title ? $request->title : $task->title,
+            'description' => $request->description ? $request->description : $task->description,
             'status' => $request->status,
         ];
 
